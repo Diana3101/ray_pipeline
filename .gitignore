@@ -1,0 +1,5 @@
+/venv/
+*.pt
+/batch_handler_tutorial/
+/getting_started/
+/yolov5_tutorial/

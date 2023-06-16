@@ -1,0 +1,3 @@
+python3 train.py --img-size 640 --cfg cfg/training/yolov7x.yaml --hyp data/hyp.scratch.custom.yaml --batch 8 --epochs 10000 --data data/crater_data.yaml --weights yolov7.pt --workers 12 --name crater-aug-transfer --apply_crop --device 1 > log.txt 2>&1 &!
+
+python test.py --data data/crater_data.yaml --img-size 512 --batch 8 --conf-thres 0.3 --iou-thres 0.5 --weights detection-v3.pt --name one_im_v1_512
