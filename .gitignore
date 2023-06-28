@@ -2,5 +2,4 @@
 *.pt
 /batch_handler_tutorial/
 /getting_started/
-/yolov5_tutorial/
 /yolo_v7/draft.py

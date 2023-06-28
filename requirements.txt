@@ -1,7 +1,7 @@
 # Usage: pip install -r requirements.txt
 
 ray==2.5.0
-# pip install "ray[serve]" requests torch
+ray[serve]
 torch==2.0.1
 requests==2.31.0
 # grpcio==1.49.1
@@ -9,7 +9,7 @@ locust==2.15.1
 
 pandas>=1.1.4
 torchvision>=0.8.1,!=0.13.0
-opencv-python==4.5.2.52
+opencv-python==4.7.0.72
 matplotlib>=3.2.2
 seaborn>=0.11.0
 scipy>=1.4.1

@@ -1,3 +1,7 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+
 import torch
 from ray import serve
 import numpy as np
@@ -8,9 +12,12 @@ from utils.torch_utils import select_device
 from utils.general import (non_max_suppression, xyxy2xywh)
 
 
-@serve.deployment()
+@serve.deployment(
+    ray_actor_options={"num_gpus": 1},
+    autoscaling_config={"min_replicas": 1, "max_replicas": 2},
+)
 class ObjectDetector:
-    def __init__(self, device='cpu', weights='detection-v3.pt'):
+    def __init__(self, device='cpu', weights='/data/dianakapatsyn/ray_pipeline/yolo_v7/detection-v3.pt'):
         # Initialize
         self.device = select_device(device)
         print(f'DEVICE: {self.device}')
@@ -20,6 +27,10 @@ class ObjectDetector:
         print('-------Load model----------')
         self.model = attempt_load(weights, map_location=device)  # load FP32 model
         print('-------Finish----------')
+
+        self.model.cuda()
+        self.device = 'cuda'
+        self.model.eval()
 
         if self.half:
             self.model.half()  # to FP16
