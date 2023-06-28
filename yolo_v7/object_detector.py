@@ -27,7 +27,7 @@ class ObjectDetector:
         batch = torch.from_numpy(batch).to(self.device)
         batch = batch.half() if self.half else batch.float()  # uint8 to fp16/32
         batch /= 255.0  # 0 - 255 to 0.0 - 1.0
-        # print(f"batch ndimension: {batch.ndimension()}")
+
         if batch.ndimension() == 3:
             batch = batch.unsqueeze(0)
         print('Batch shape before pred: ', batch.shape)

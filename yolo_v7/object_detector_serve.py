@@ -1,12 +1,11 @@
+import torch
 from ray import serve
+import numpy as np
+from starlette.requests import Request
+
 from models.experimental import attempt_load
 from utils.torch_utils import select_device
-import torch
 from utils.general import (non_max_suppression, xyxy2xywh)
-from starlette.requests import Request
-import numpy as np
-
-from typing import List
 
 
 @serve.deployment()
@@ -32,7 +31,7 @@ class ObjectDetector:
         batch = torch.from_numpy(batch).to(self.device)
         batch = batch.half() if self.half else batch.float()  # uint8 to fp16/32
         batch /= 255.0  # 0 - 255 to 0.0 - 1.0
-        # print(f"batch ndimension: {batch.ndimension()}")
+
         if batch.ndimension() == 3:
             batch = batch.unsqueeze(0)
         print('Batch shape before pred: ', batch.shape)
@@ -72,7 +71,6 @@ class ObjectDetector:
     @serve.batch(max_batch_size=4)
     async def handle_batch(self, input_batch: np.ndarray):
         print("Our input batch has length:", len(input_batch))
-        # print(f"Handle batch type: {type(input_batch)}")
 
         results = self.detect(batch=input_batch)
         return results
