@@ -1,7 +1,3 @@
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-
-
 import torch
 from ray import serve
 import numpy as np
@@ -13,24 +9,23 @@ from utils.general import (non_max_suppression, xyxy2xywh)
 
 
 @serve.deployment(
-    ray_actor_options={"num_gpus": 1},
+    ray_actor_options={"num_gpus": 1, "num_cpus": 10},
     autoscaling_config={"min_replicas": 1, "max_replicas": 2},
 )
 class ObjectDetector:
-    def __init__(self, device='cpu', weights='/data/dianakapatsyn/ray_pipeline/yolo_v7/detection-v3.pt'):
-        # Initialize
-        self.device = select_device(device)
-        print(f'DEVICE: {self.device}')
-        self.half = self.device.type != 'cpu'  # half precision only supported on CUDA
-
+    def __init__(self, weights='/data/dianakapatsyn/ray_pipeline/yolo_v7/detection-v3.pt'):
         # Load model
         print('-------Load model----------')
-        self.model = attempt_load(weights, map_location=device)  # load FP32 model
+        self.model = attempt_load(weights, map_location=torch.device('cpu'))  # load FP32 model
         print('-------Finish----------')
+        print('Is CUDA available: ', torch.cuda.is_available())
 
+        # Initialize
         self.model.cuda()
-        self.device = 'cuda'
+        self.device = torch.device('cuda:0')
+        self.half = self.device.type != 'cpu'  # half precision only supported on CUDA
         self.model.eval()
+        print(f'DEVICE: {self.device}')
 
         if self.half:
             self.model.half()  # to FP16
