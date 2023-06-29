@@ -3,4 +3,5 @@
 /batch_handler_tutorial/
 /getting_started/
 /yolo_v7/draft.py
-__pycache__/
+/yolo_v7/__pycache__/
+/yolo_v5_tutorial/__pycache__/
