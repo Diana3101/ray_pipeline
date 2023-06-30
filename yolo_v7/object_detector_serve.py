@@ -10,7 +10,7 @@ from utils.general import (non_max_suppression, xyxy2xywh)
 
 @serve.deployment()
 class ObjectDetector:
-    def __init__(self, device='cpu', weights='detection-v3.pt'):
+    def __init__(self, device='cpu', weights='yolov7.pt'):
         # Initialize
         self.device = select_device(device)
         print(f'DEVICE: {self.device}')

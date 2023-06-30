@@ -3,7 +3,6 @@ import os
 import requests
 
 import rasterio
-import ray
 
 from object_detector import ObjectDetector
 
@@ -34,21 +33,17 @@ for filename in os.listdir(directory):
     f = os.path.join(directory, filename)
     with rasterio.open(f) as image:
         image_array = image.read()
-        batch_list.append(image_array)
+        batch_list.append(image_array.tolist())
 
 
-@ray.remote
-def send_query(image_array):
-    data = {'image_array': image_array.tolist(),
-            'is_batching': True}
-    response = requests.post("http://127.0.0.1:8000/", json=data)
-    return response.json()
-
+data = {'image_array': batch_list,
+        'is_batching': False}
 
 time_rest_0 = time.time_ns() // 1_000_000
-results = ray.get([send_query.remote(image_array) for image_array in batch_list])
+response = requests.post("http://127.0.0.1:8000/", json=data)
 time_rest_1 = time.time_ns() // 1_000_000
-print(f'Time for REST (batch): {time_rest_1 - time_rest_0} ms')
+print(f'Time for REST (batch): {time_rest_1-time_rest_0} ms')
+results = response.json()
 
 
 time_0 = time.time_ns() // 1_000_000
