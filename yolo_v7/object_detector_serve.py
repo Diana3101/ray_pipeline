@@ -9,8 +9,8 @@ from utils.general import (non_max_suppression, xyxy2xywh)
 
 
 @serve.deployment(
-    ray_actor_options={"num_gpus": 1, "num_cpus": 10},
-    autoscaling_config={"min_replicas": 1, "max_replicas": 2},
+    ray_actor_options={"num_gpus": 1, "num_cpus": 6},
+    autoscaling_config={"min_replicas": 1, "max_replicas": 4}
 )
 class ObjectDetector:
     def __init__(self, weights='/data/dianakapatsyn/ray_pipeline/yolo_v7/detection-v3.pt'):
@@ -40,7 +40,6 @@ class ObjectDetector:
 
         if batch.ndimension() == 3:
             batch = batch.unsqueeze(0)
-        print('Batch shape before pred: ', batch.shape)
 
         with torch.no_grad():  # Calculating gradients would cause a GPU memory leak
             pred = self.model(batch, augment=False)[0]
@@ -58,15 +57,16 @@ class ObjectDetector:
 
                 for *xyxy, conf, cls in reversed(det):
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4))).view(-1).tolist()  # normalized xywh
+
                     res.append({
                         'x': xywh[0],
                         'y': xywh[1],
                         'w': xywh[2],
                         'h': xywh[3],
-                        'xmin': xyxy[0],
-                        'ymin': xyxy[1],
-                        'xmax': xyxy[2],
-                        'ymax': xyxy[3],
+                        'xmin': xyxy[0].item(),
+                        'ymin': xyxy[1].item(),
+                        'xmax': xyxy[2].item(),
+                        'ymax': xyxy[3].item(),
                         'conf': float(conf),
                         'cls': int(cls)
                     })
@@ -74,7 +74,9 @@ class ObjectDetector:
 
         return results
 
-    @serve.batch(max_batch_size=4)
+    @serve.batch(max_batch_size=32,
+                 # time to wait before returning an incomplete batch (in seconds)
+                 batch_wait_timeout_s=0.5)
     async def handle_batch(self, input_batch: np.ndarray):
         print("Our input batch has length:", len(input_batch))
 
@@ -82,12 +84,9 @@ class ObjectDetector:
         return results
 
     async def __call__(self, http_request: Request):
-        print('--------Getting Image path-----------')
         data = await http_request.json()
         image_array = np.array(data['image_array'])
         is_batching = data['is_batching']
-        print(image_array.shape)
-        print('--------Image path has got-----------')
 
         if is_batching:
             return await self.handle_batch(input_batch=image_array)
