@@ -48,4 +48,10 @@ locust -f locust_test.py
 | :-- | :-: | :-: | :-: |
 | 32 | 11 | 85 | 95 |
 
+<div align="center">
+    <a href="./">
+        <img src="./figure/load_testing.png" width="79%"/>
+    </a>
+</div>
+
 **You can find detailed results of the experiments in the [**Google sheet**](https://docs.google.com/spreadsheets/d/1MJICCQJi-ZQDgATnPMgaednYdPSER0w4kr_0yPJeuj0/edit?usp=sharing)**
