@@ -2,11 +2,16 @@
 
 ## Running a Ray Serve Application
 - Use requirements.txt to install dependencies
-- Go to yolo_v7 folder
-- Upload [**YOLOv7 weights**](https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt) to the yolo_v7 folder
+- Upload [**YOLOv7 weights**](https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt) to the yolo_v7 folder 
+- OR you can upload your own weights for the yolo_v7 model BUT you need to change file name in object_detector_serve.py
 - Start a Ray Cluster: 
 ```bash
 ray start --head --port=6379
+```
+**Note:** The following code was added to the yolo_v7/models/experimental.py for correct imports
+```
+import sys
+sys.path.append('/data/dianakapatsyn/ray_pipeline/yolo_v7/')
 ```
 - Start a Ray Serve app:
 ```bash
@@ -26,18 +31,33 @@ ray start --head --port=6379
 serve run object_detector_serve:detector
 ```
 
+## Process images with a Ray Serve Application
+
+Processing consists of 3 steps:
+1. Cropping images of arbitrary size into equal-sized patches (by default 512x512)
+2. Predicting bounded boxes on patches using Ray serve with batch handler over yolo_v7 model
+3. Converting bounded boxes coordinates to GeoJson format and saving file (for each image separately or united for all images)
+
+- Run the following command to process images:
+    - save geojson for each image separately
+    ```
+    python object_detector_client.py --input_dir /data/dianakapatsyn/ray_pipeline/input_images/ --output_dir /data/dianakapatsyn/ray_pipeline/output_geojsons/
+    ```
+    - save united geojson
+    ```
+    python object_detector_client.py --input_dir /data/dianakapatsyn/ray_pipeline/input_images/ --output_dir /data/dianakapatsyn/ray_pipeline/output_geojsons/ --united_geojson
+    ```
+
 ## Test a Ray Serve Application over HTTP
 
 ### Test connection and output format:
-- While detector is running, open a separate terminal window 
-- Go to yolo_v7 folder
+- While detector is running, open a separate terminal window
 - Run the client script:
 ```bash
-python object_detector_client.py
+python object_detector_test_client.py
 ```
 ### Load Testing using Locust
-- While detector is running, open a separate terminal window 
-- Go to yolo_v7 folder
+- While detector is running, open a separate terminal window
 - Run the following command:
 ```bash
 locust -f locust_test.py

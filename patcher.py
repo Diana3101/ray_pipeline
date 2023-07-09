@@ -3,6 +3,7 @@ import os
 import numpy as np
 import rasterio
 from rasterio.windows import Window
+from tqdm import tqdm
 
 
 class ImagePatcher:
@@ -17,7 +18,7 @@ class ImagePatcher:
         crss = []
         output_files_names = []
 
-        for filename in os.listdir(self.input_dir):
+        for filename in tqdm(os.listdir(self.input_dir)):
             output_file_name = filename.split("/")[-1].split(".")[0]
             input_file = os.path.join(self.input_dir, filename)
 
