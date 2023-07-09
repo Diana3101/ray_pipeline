@@ -3,7 +3,6 @@ import os
 import requests
 
 import rasterio
-import ray
 
 batch_list = []
 directory = 'batch'
@@ -26,7 +25,7 @@ def send_query(image_array):
 
 
 time_rest_0 = time.time_ns() // 1_000_000
-results = ray.get([send_query.remote(image_array) for image_array in batch_list])
+response = requests.post("http://127.0.0.1:8000/", json=data)
 time_rest_1 = time.time_ns() // 1_000_000
 print(f'Time for {len(batch_list)}-batch using batch_handler: {time_rest_1 - time_rest_0} ms')
 

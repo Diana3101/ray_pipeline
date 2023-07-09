@@ -4,6 +4,7 @@ from locust import HttpUser, task, constant_throughput
 import rasterio
 import ray
 
+
 batch_list = []
 directory = 'batch'
 for filename in os.listdir(directory):
@@ -28,4 +29,3 @@ class CraterLocation(HttpUser):
                 json=data,
                 timeout=5
             )
-

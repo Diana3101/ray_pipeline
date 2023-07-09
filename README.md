@@ -17,6 +17,7 @@ sys.path.append('/data/dianakapatsyn/ray_pipeline/yolo_v7/')
 ```bash
 serve run object_detector_serve:detector
 ```
+
 ## How restart a Ray Serve Application
 - Stop a Ray Cluster and all running processes:
 ```bash
@@ -39,6 +40,7 @@ Processing consists of 3 steps:
 3. Converting bounded boxes coordinates to GeoJson format and saving file (for each image separately or united for all images)
 
 - Run the following command to process images:
+
     - save geojson for each image separately
     ```
     python object_detector_client.py --input_dir /data/dianakapatsyn/ray_pipeline/input_images/ --output_dir /data/dianakapatsyn/ray_pipeline/output_geojsons/
@@ -56,6 +58,7 @@ Processing consists of 3 steps:
 ```bash
 python object_detector_test_client.py
 ```
+
 ### Load Testing using Locust
 - While detector is running, open a separate terminal window
 - Run the following command:

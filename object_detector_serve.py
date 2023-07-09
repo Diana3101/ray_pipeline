@@ -13,7 +13,7 @@ from yolo_v7.utils.general import (non_max_suppression, xyxy2xywh)
     autoscaling_config={"min_replicas": 1, "max_replicas": 4}
 )
 class ObjectDetector:
-    def __init__(self, weights='/data/dianakapatsyn/ray_pipeline/yolo_v7/detection-v3.pt'):
+    def __init__(self, weights='/data/dianakapatsyn/ray_pipeline/yolo_v7/yolov7.pt'):
         # Load model
         print('-------Load model----------')
         self.model = attempt_load(weights, map_location=torch.device('cpu'))  # load FP32 model
