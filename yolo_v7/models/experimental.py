@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/data/dianakapatsyn/ray_pipeline/yolo_v7/')
+
 import numpy as np
 import random
 import torch
